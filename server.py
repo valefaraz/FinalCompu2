@@ -5,7 +5,7 @@ import argparse
 import sys
 
 
-def handle(reader, writer):
+async def handle(reader, writer):
     fd = os.open('/home/valentin/Escritorio/compu2/final/index.html', os.O_RDONLY)
     body = os.read(fd,os.stat('/home/valentin/Escritorio/compu2/final/index.html').st_size)
     os.close(fd)
@@ -14,7 +14,10 @@ def handle(reader, writer):
             "pdf": " application/pdf"}
     respuesta= '200 OK'
     header = bytearray("HTTP/1.1 " + respuesta + "\r\nContent-type:" + 'html' 
-                    +"\r\nContent-length:" + str(len(body)) + "\r\n\r\n",'utf8')       
+                    +"\r\nContent-length:" + str(len(body)) + "\r\n\r\n",'utf8')
+
+    data = await reader.read(1000)
+    print(data)
     writer.write(header)
     writer.write(body)
     
@@ -23,7 +26,7 @@ def handle(reader, writer):
 async def main():
     server = await asyncio.start_server(
                     handle,
-                    ['127.0.0.1', '::1'], 
+                    ['127.0.0.1', '::1'],
                     8080)
 
     addr = server.sockets[0].getsockname()
@@ -33,6 +36,6 @@ async def main():
         await server.serve_forever()
 
 
-#if __name__ == "__main__":
+if __name__ == "__main__":
 
-asyncio.run(main())
+    asyncio.run(main())
