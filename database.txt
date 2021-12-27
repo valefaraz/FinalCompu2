@@ -1,5 +1,5 @@
 name: scc
 user: valentin
-pass: 1999db
+pass: valentin
 
 localhost:3306
