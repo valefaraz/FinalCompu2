@@ -13,4 +13,6 @@ print("Conectado al servidor")
 
 #    time.sleep(5)
     #Con el método send, enviamos el mensaje
-socket.sendall(b"10")
+while True:
+    socket.sendall(b"10")
+
