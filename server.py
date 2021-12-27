@@ -29,6 +29,9 @@ async def handle(reader, writer):
 
         writer.write(header)
         writer.write(body)
+        #await writer.drain()
+        writer.close()
+
     
 
 

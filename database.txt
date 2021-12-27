@@ -1,0 +1,5 @@
+name: scc
+user: valentin
+pass: 1999db
+
+localhost:3306
