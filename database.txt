@@ -3,3 +3,10 @@ user: valentin
 pass: valentin
 
 localhost:3306
+
+comandos sql
+
+create table mediciones (id int unsigned not null primary key auto_increment,id_sensor int unsigned not null,foreign key (id_sensor) references sensores(id), valor int not null,fecha datetime);
+
+
+

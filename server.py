@@ -1,10 +1,10 @@
+from socket import socket
 import socketserver
 import os
 import asyncio
 import argparse
 import sys
-from request import request
-
+from time import sleep
 
 async def handle(reader, writer):
     
@@ -12,13 +12,19 @@ async def handle(reader, writer):
             "ppm": " image/x-portable-pixmap", "html": " text/html",
             "pdf": " application/pdf"}'''
 
-    data = await reader.read(10000)
+    data = await reader.read(100000)
+
     print(data)
-    solicitud = request(data)
+    if data == b'10':
+
+        solicitud = 'sensor'
+    else:
+        solicitud = 'web'
+
     if solicitud == 'sensor':
+
         print ('Dato recibido')
     elif solicitud =='web':
-        
         path = os.getcwd() + '/index.html'
         fd = os.open(path, os.O_RDONLY)
         body = os.read(fd,os.stat(path).st_size)
