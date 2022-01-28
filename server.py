@@ -4,7 +4,7 @@ import os
 import asyncio
 import argparse
 import sys
-from time import sleep
+import db
 
 async def handle(reader, writer):
     
@@ -15,16 +15,12 @@ async def handle(reader, writer):
     data = await reader.read(100000)
 
     print(data)
-    if data == b'10':
-
-        solicitud = 'sensor'
-    else:
-        solicitud = 'web'
-
-    if solicitud == 'sensor':
-
+    
+    if  data.decode()[0:6] == 'sensor':                         #Datos del sensor 
         print ('Dato recibido')
-    elif solicitud =='web':
+        db.insert(data.decode())
+
+    else:                                                        #Solicitud web
         path = os.getcwd() + '/index.html'
         fd = os.open(path, os.O_RDONLY)
         body = os.read(fd,os.stat(path).st_size)
@@ -45,7 +41,7 @@ async def main():
     server = await asyncio.start_server(
                     handle,
                     ['127.0.0.1', '::1'],
-                    8080)
+                    8000)
 
     addr = server.sockets[0].getsockname()
     print(f'Serving on {addr}')
