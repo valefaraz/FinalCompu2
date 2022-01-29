@@ -7,18 +7,37 @@ import sys
 import db
 
 async def handle(reader, writer):
-    
-    '''dic = {"ico": "image/vnd.svf", "txt": " text/plain", "jpg": " image/jpeg",
-            "ppm": " image/x-portable-pixmap", "html": " text/html",
-            "pdf": " application/pdf"}'''
 
     data = await reader.read(100000)
 
     print(data)
     
-    if  data.decode()[0:6] == 'sensor':                         #Datos del sensor 
+    if  data.decode()[0:6] == 'sensor':                         #Solicitud del sensor 
         print ('Dato recibido')
+        
         db.insert(data.decode())
+        
+        control = db.select_valor(data.decode()[9:10])
+        print(control[0],control[1])
+
+        if str(control[1]) == 'Temperatura':
+            if int(control[0]) < 10:
+                print('Temperatura muy baja')
+                None #Temperatura muy baja
+            if int(control[0]) > 30:
+                print('Temperatura muy Alta')
+                None #Temperatura muy Alta
+                
+        elif str(control[1]) == 'Humedad':
+            if int(control[0]) < 10:
+                print('Muy Seco')
+                None #Muy Seco
+            if int(control[0]) > 30:
+                print('Muy Humedo')
+                None #Muy Humedo
+        
+
+
 
     else:                                                        #Solicitud web
         path = os.getcwd() + '/index.html'
