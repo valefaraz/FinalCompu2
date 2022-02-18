@@ -13,3 +13,8 @@ select * from mediciones where id_sensor='1' order by id desc limit 1;
 
 select mediciones.id,id_sensor,valor,fecha,s.tipo from mediciones join sensores as s on mediciones.id_sensor=s.id;
 
+}
+
+SELECT mediciones.valor,s.tipo FROM mediciones join sensores as s on mediciones.id_sensor=s.id where id_sensor='1 order by mediciones.id desc limit 1;
+
+

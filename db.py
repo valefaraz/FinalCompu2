@@ -1,11 +1,6 @@
 import pymysql
 
 
-connection = pymysql.connect(host="localhost",
-                            user="valentin",
-                            passwd="valentin",
-                            database="scc")
-
 def insert(data):
     connection = pymysql.connect(host="localhost",
                             user="valentin",
@@ -24,19 +19,19 @@ def insert(data):
             cursor.execute(sql, (id_sensor,valor,fecha))
             connection.commit()
 
-def select_valor(sensor):
+def select_valor(cantidad_sensores):
     connection = pymysql.connect(host="localhost",
                             user="valentin",
                             passwd="valentin",
                             database="scc")
-    print(sensor)
-
+    result=[]
     with connection:
         with connection.cursor() as cursor:
-            sql = "SELECT mediciones.valor,s.tipo FROM mediciones join sensores as s on mediciones.id_sensor=s.id where id_sensor=%s order by mediciones.id desc limit 1;"
-            cursor.execute(sql,(str(sensor),))
-            result = cursor.fetchone()
-            print (result)
+            for i in range(cantidad_sensores):
+                sql = "SELECT mediciones.valor,s.tipo FROM mediciones join sensores as s on mediciones.id_sensor=s.id where id_sensor=%s order by mediciones.id desc limit 1;"
+                cursor.execute(sql,(str(i+1),))
+                select = cursor.fetchone()
+                result.append(select)
     return result
 
             #result=result.split(sep=', ')

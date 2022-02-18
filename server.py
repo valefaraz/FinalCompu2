@@ -5,22 +5,28 @@ import asyncio
 import argparse
 import sys
 import db
+from string import Template
+
+filein= open(os.getcwd() + '/index.html')
+src=Template(filein.read())
+cantidad_sensores=2
 
 async def handle(reader, writer):
+    
+    ult_mediciones = db.select_valor(cantidad_sensores)
+    print(ult_mediciones)
+    print(ult_mediciones[0][1])
+    print(len(ult_mediciones))
 
     data = await reader.read(100000)
-
     print(data)
     
     if  data.decode()[0:6] == 'sensor':                         #Solicitud del sensor 
         print ('Dato recibido')
         
         db.insert(data.decode())
-        
-        control = db.select_valor(data.decode()[9:10])
-        print(control[0],control[1])
 
-        if str(control[1]) == 'Temperatura':
+        '''if str(control[1]) == 'Temperatura':
             if int(control[0]) < 10:
                 print('Temperatura muy baja')
                 None #Temperatura muy baja
@@ -34,16 +40,21 @@ async def handle(reader, writer):
                 None #Muy Seco
             if int(control[0]) > 30:
                 print('Muy Humedo')
-                None #Muy Humedo
+                None #Muy Humedo    '''
+    else:         
+        D={'humedad':'10'}
+        v_web= src.substitute(D)                                             #Solicitud web
         
 
+        path = os.getcwd() + '/filein.html' 
+        fd = open(path,'w')
+        fd.writelines(v_web)
+        fd.close()
 
-
-    else:                                                        #Solicitud web
-        path = os.getcwd() + '/index.html'
-        fd = os.open(path, os.O_RDONLY)
-        body = os.read(fd,os.stat(path).st_size)
-        os.close(fd)
+        fd2=os.open(path, os.O_RDONLY)
+        body = os.read(fd2,os.stat(path).st_size)
+        #print(body)
+        os.close(fd2)
         respuesta= '200 OK'
         header = bytearray("HTTP/1.1 " + respuesta + "\r\nContent-type:" + 'text/html' 
                     +"\r\nContent-length:" + str(len(body)) + "\r\n\r\n",'utf8')
