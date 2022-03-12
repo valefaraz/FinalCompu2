@@ -8,13 +8,73 @@
 <body>
     <h1>Sistema de control de cultivos</h1>
     
-    
-    10
+    <table class="tabla">
+        <tr>
+            <th>ID_Sensor</th>
+            <th>Tipo</th>
+            <th>Medición</th>
+            <th>Hora última medición</th>
+        </tr>
+        <tr>
+          <td>1</td>
+          <td>Temperatura</td>
+          <td>23.43</td>
+          <td>2022-03-12 16:59:07</td>
+        </tr>
+        <tr>
+            <td>2</td>
+            <td>Humedad</td>
+            <td>12.09</td>
+            <td>2022-03-12 16:54:48</td>
+        </tr>
+        <tr>
+            <td>2</td>
+            <td>Humedad</td>
+            <td>12.09</td>
+            <td>2022-03-12 16:54:48</td>
+        </tr>
+        <tr>
+            <td>2</td>
+            <td>Humedad</td>
+            <td>12.09</td>
+            <td>2022-03-12 16:54:48</td>
+        </tr>
+        <tr>
+            <td>2</td>
+            <td>Humedad</td>
+            <td>12.09</td>
+            <td>2022-03-12 16:54:48</td>
+        </tr>
+
+      </table>
+
     <script> 
     setTimeout(function(){
     window.location.reload(1);
     }, 50000);
-
-    /*console.log(10)*/
     </script>
+
+
+    <style>
+        h1 {    color: #039;
+            margin:45px;
+            margin-left:150px ;
+
+        }
+        table.tabla {
+            border-collapse: collapse;
+                                        }
+        body {font-family: Arial, Helvetica, sans-serif;}
+
+        table {font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
+                    font-size: 20px; margin: 45px;width: 720px; text-align: left;border-collapse: collapse; }
+
+        th {font-size: 25px;font-weight: normal;padding: 8px; background: #b9c9fe;
+                border-top: 4px solid #aabcfe;border-bottom: 1px solid #fff; color: #039; }
+
+        td {padding: 15px;background: #e8edff;border-bottom: 1px solid #fff;
+            color: #669;border-top: 1px solid transparent; }
+
+        tr:hover td { background: #d0dafd; color: #339; }
+    </style>
     </html>

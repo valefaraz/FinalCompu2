@@ -11,8 +11,8 @@ count=0
 
 while True:
     clave ='sensor'
-    id_sensor='2'
-    valor=str(round((random.uniform(0, 45)),2))
+    id_sensor='1'                                           #Sensor de temperatura 1
+    valor=str(round((random.uniform(10, 40)),2))
     fecha = str(datetime.now())[0:19]
     print(valor)
 

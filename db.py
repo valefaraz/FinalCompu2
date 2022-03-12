@@ -28,7 +28,8 @@ def select_valor(cantidad_sensores):
     with connection:
         with connection.cursor() as cursor:
             for i in range(cantidad_sensores):
-                sql = "SELECT mediciones.valor,s.tipo FROM mediciones join sensores as s on mediciones.id_sensor=s.id where id_sensor=%s order by mediciones.id desc limit 1;"
+                sql= 'SELECT s.id,s.tipo,mediciones.valor,mediciones.fecha FROM mediciones join sensores as s on mediciones.id_sensor=s.id where id_sensor=%s order by mediciones.id desc limit 1;'
+                #sql = "SELECT mediciones.valor,s.tipo FROM mediciones join sensores as s on mediciones.id_sensor=s.id where id_sensor=%s order by mediciones.id desc limit 1;"
                 cursor.execute(sql,(str(i+1),))
                 select = cursor.fetchone()
                 result.append(select)
