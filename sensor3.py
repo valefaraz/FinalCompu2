@@ -11,8 +11,8 @@ count=0
 
 while True:
     clave ='sensor'
-    id_sensor='3'                                           #Sensor de .....
-    valor=str(round((random.uniform(10, 40)),2))
+    id_sensor='3'                                           #Sensor de PH
+    valor=str(round((random.uniform(0, 14)),2))             #Rango:0-14. <7 indica acidez. >7 indican alcalinidad.
     fecha = str(datetime.now())[0:19]
     print(valor)
 

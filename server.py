@@ -10,7 +10,7 @@ from string import Template
 from parceo import Parceo
 
 
-cantidad_sensores=2
+cantidad_sensores=4
 
 async def handle(reader, writer):
     
@@ -71,9 +71,9 @@ async def handle(reader, writer):
                         +"\r\nContent-length:" + str(len(body)) + "\r\n\r\n",'utf8')
 
 
-    writer.write(header)                                                                        #Respondemos con la cabecera
-    writer.write(body)                                                                          #Respondemos con el body
-    writer.close()
+        writer.write(header)                                                                        #Respondemos con la cabecera
+        writer.write(body)                                                                          #Respondemos con el body
+        writer.close()
 
 
 async def main():
