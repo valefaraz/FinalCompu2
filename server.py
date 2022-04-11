@@ -7,10 +7,17 @@ import sys
 from urllib import request
 import db
 from string import Template
-from parceo import Parceo
 
 
 cantidad_sensores=4
+
+def parcear(dato):
+   try:
+       encabezado = dato.decode().splitlines()[0]
+       pedido = encabezado.split()
+   except:
+       pass
+   return(pedido)
 
 async def handle(reader, writer):
     
@@ -20,11 +27,15 @@ async def handle(reader, writer):
     if  data.decode()[0:6] == 'sensor':                             #Solicitud del sensor 
         print ('Dato recibido')
         db.insert(data.decode())
-    
+
+        ult_mediciones = db.select_valor(cantidad_sensores)
+        #print(ult_mediciones)
+        
+
 
     else:                                                                   #Solicitud web
         
-        consulta=Parceo.parcear(data)
+        consulta=parcear(data)
         print(consulta)
         
         if consulta[0] == "GET":                                                                #Respuesta a  metodo GET
@@ -33,6 +44,7 @@ async def handle(reader, writer):
                 src=Template(filein.read())
 
                 ult_mediciones = db.select_valor(cantidad_sensores)
+                #print(ult_mediciones)
                 D={}
                 for num in range(cantidad_sensores):
                     D['sensor'+str(num+1)]= ult_mediciones[num][0]
@@ -92,24 +104,3 @@ async def main():
 if __name__ == "__main__":
 
     asyncio.run(main())
-
-
-
-
-
-
-    '''if str(control[1]) == 'Temperatura':
-            if int(control[0]) < 10:
-                print('Temperatura muy baja')
-                None #Temperatura muy baja
-            if int(control[0]) > 30:
-                print('Temperatura muy Alta')
-                None #Temperatura muy Alta
-                
-        elif str(control[1]) == 'Humedad':
-            if int(control[0]) < 10:
-                print('Muy Seco')
-                None #Muy Seco
-            if int(control[0]) > 30:
-                print('Muy Humedo')
-                None #Muy Humedo    '''
