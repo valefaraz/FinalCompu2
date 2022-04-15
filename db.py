@@ -2,8 +2,12 @@ import pymysql
 import json
 
 def insert(data):
-    
-    #sensor , 1 , 25 , 2022-01-27 20:50:55
+    with open("config.json", "r") as j:
+        config =json.load(j)
+    connection = pymysql.connect(host=config["host"],
+                        user=config["user"],
+                        passwd=config["pass"],
+                        database=config["name"])
     lista=data.split(sep=' , ')
     id_sensor=lista[1]
     valor=lista[2]
@@ -15,7 +19,12 @@ def insert(data):
             connection.commit()
 
 def select_valor(cantidad_sensores):
-
+    with open("config.json", "r") as j:
+        config =json.load(j)
+    connection = pymysql.connect(host=config["host"],
+                        user=config["user"],
+                        passwd=config["pass"],
+                        database=config["name"])
     result=[]
     with connection:
         with connection.cursor() as cursor:
@@ -26,18 +35,3 @@ def select_valor(cantidad_sensores):
                 select = cursor.fetchone()
                 result.append(select)
     return result
-
-            #result=result.split(sep=', ')
-            #print (result[2])
-        #connection.commit()
-
-
-
-if __name__ == "__main__":
-    with open("config.json", "r") as j:
-        data =json.load(j)
-
-    connection = pymysql.connect(host=data["host"],
-                            user=data["user"],
-                            passwd=data["pass"],
-                            database=data["name"])

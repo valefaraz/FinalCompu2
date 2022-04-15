@@ -12,7 +12,7 @@ count=0
 while True:
     clave ='sensor'
     id_sensor='2'                                           #Sensor de humedad 1
-    valor=str(round((random.uniform(10, 40)),2))
+    valor=str(round((random.uniform(10, 90)),2))            #porcentaje del 10% al 90
     fecha = str(datetime.now())[0:19]
     print(valor)
 

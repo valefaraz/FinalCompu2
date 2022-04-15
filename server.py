@@ -1,3 +1,4 @@
+from cmath import phase
 from socket import socket
 import socketserver
 import os
@@ -7,6 +8,7 @@ import sys
 from urllib import request
 import db
 from string import Template
+import tasks_celery
 
 
 cantidad_sensores=4
@@ -29,8 +31,57 @@ async def handle(reader, writer):
         db.insert(data.decode())
 
         ult_mediciones = db.select_valor(cantidad_sensores)
-        #print(ult_mediciones)
-        
+    
+        print(ult_mediciones[0][2])
+        #[(1, 'Temperatura', 12.96, datetime.datetime(2022, 4, 14, 20, 59, 56)), 
+        #(2, 'Humedad', 25.0, datetime.datetime(2022, 4, 8, 12, 53, 28)), 
+        #(3, 'PH', 13.0, datetime.datetime(2022, 4, 8, 12, 53, 35)), 
+        #(4, 'Luminosidad', 1.0, datetime.datetime(2022, 4, 8, 12, 54, 31))]
+        temperatura=[15,35] #rango permitido de temperatura
+        humedad=[30,70]     #rango permitido de humedad
+        ph=[5,6.5]          #rango permitido de ph
+        #luminosidad=[]     #No se enviaran alertas en tiempo real de la luminosidad
+        alerta=""
+        for num in range(cantidad_sensores-1):
+
+            if (ult_mediciones[num][1]) == "Temperatura":
+                if float(ult_mediciones[num][2]) < temperatura[0]:
+                    alerta= alerta + "\nMedicion de" +str(ult_mediciones[num][1])+" por DEBAJO del rango aceptable: "+str(ult_mediciones[num][2])
+                    #print(alerta)
+
+                elif float(ult_mediciones[num][2]) > temperatura[1]:
+                    alerta= alerta + "\nMedicion de"+str(ult_mediciones[num][1])+" por ARRIBA del rango aceptable: "+str(ult_mediciones[num][2])
+                    #print(alerta)
+                else:
+                    alerta=alerta + "\nTemperatura OK"
+                    #print(alerta)
+
+            elif (ult_mediciones[num][1]) == "Humedad":
+                if float(ult_mediciones[num][2]) < humedad[0]:
+                    alerta=alerta + "\nMedicion de " +str(ult_mediciones[num][1])+" por DEBAJO del rango aceptable: "+str(ult_mediciones[num][2])
+                    #print(alerta)
+
+                elif float(ult_mediciones[num][2]) > humedad[1]:
+                    alerta=alerta + "\nMedicion de "+str(ult_mediciones[num][1])+" por ARRIBA del rango aceptable: "+str(ult_mediciones[num][2])
+                    #print(alerta)
+                else:
+                    alerta=alerta + "\nHumedad OK"
+                    #print(alerta)
+
+            elif (ult_mediciones[num][1]) == "PH":
+                if float(ult_mediciones[num][2]) < ph[0]:
+                    alerta= alerta + "\nMedicion de" +str(ult_mediciones[num][1])+" por DEBAJO del rango aceptable: "+str(ult_mediciones[num][2])
+                    #print(alerta)
+
+                elif float(ult_mediciones[num][2]) > ph[1]:
+                    alerta= alerta + "\nMedicion de "+str(ult_mediciones[num][1])+" por ARRIBA del rango aceptable: "+str(ult_mediciones[num][2])
+                    #print(alerta)
+                else:
+                    alerta=alerta + "\nPH OK"
+                    #print(alerta)
+    
+        tasks_celery.enviar_correo.delay(alerta)
+
 
 
     else:                                                                   #Solicitud web
@@ -51,6 +102,7 @@ async def handle(reader, writer):
                     D['tipo'+str(num+1)]= ult_mediciones[num][1]
                     D['medicion'+str(num+1)]= ult_mediciones[num][2]
                     D['fecha'+str(num+1)]= ult_mediciones[num][3]
+                #print(D)
                 v_web= src.substitute(D)                                           
                 path = os.getcwd() + '/filein.html'
                 fd = open(path,'w')

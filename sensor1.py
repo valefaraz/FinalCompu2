@@ -12,7 +12,7 @@ count=0
 while True:
     clave ='sensor'
     id_sensor='1'                                           #Sensor de temperatura 1
-    valor=str(round((random.uniform(10, 40)),2))
+    valor=str(round((random.uniform(-10, 50)),2))
     fecha = str(datetime.now())[0:19]
     print(valor)
 
@@ -20,7 +20,7 @@ while True:
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.connect((HOST, PORT))
         s.send(datos.encode())
-        time.sleep(10)
+        time.sleep(1000)
         s.close()
         count = count+1
         print(count)
