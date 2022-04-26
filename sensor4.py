@@ -11,8 +11,8 @@ count=0
 
 while True:
     clave ='sensor'
-    id_sensor='4'                                           #Sensor de Luminosidad
-    valor=str(round((random.uniform(5000, 50000)),2))       #lux
+    id_sensor='4'                                           #Sensor de Iluminancia
+    valor=str(round((random.uniform(100, 2000)),2))         #lux=lumen /m²
     fecha = str(datetime.now())[0:19]
     print(valor)
 
@@ -20,7 +20,7 @@ while True:
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.connect((HOST, PORT))
         s.send(datos.encode())
-        time.sleep(864)
+        time.sleep(86400)
         s.close()
         count = count+1
         print(count)
