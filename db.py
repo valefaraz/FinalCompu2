@@ -36,18 +36,8 @@ def select_ultimos_valores(cantidad_sensores):
                 result.append(select)
     return result
 
-
 def select_ultimo(id):
-    """with open("config.json", "r") as j:
-        config =json.load(j)
-    connection = pymysql.connect(host=config["host"],
-                        user=config["user"],
-                        passwd=config["pass"],
-                        database=config["name"])
-    """
     connection = conexion()
-
-    
     with connection:
         with connection.cursor() as cursor:
             sql= 'SELECT s.id,s.tipo,mediciones.valor,mediciones.fecha FROM mediciones join sensores as s on mediciones.id_sensor=s.id where id_sensor=%s order by mediciones.id desc limit 1;'
@@ -64,7 +54,6 @@ def select_lux():
             select = cursor.fetchall()
     return select
 
-
 def select_ph():
     connection = conexion()
     with connection:
@@ -73,7 +62,6 @@ def select_ph():
             cursor.execute(sql)
             select = cursor.fetchall()
     return select
-
 
 def select_humedad():
     connection = conexion()

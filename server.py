@@ -41,7 +41,7 @@ async def handle(reader, writer):
         humedad=[30,70]     #rango permitido de humedad
         ph=[5,6.5]          #rango permitido de ph
         alerta=""
-        '''
+        
         if (ult_mediciones[1]) == "Temperatura":
             if float(ult_mediciones[2]) < temperatura[0]:
                 alerta = "\nMedicion de" +str(ult_mediciones[1])+" por DEBAJO del rango aceptable: "+str(ult_mediciones[2])
@@ -72,7 +72,7 @@ async def handle(reader, writer):
             else:
                 alerta="\nPH OK"
         print(alerta)
-        '''
+        
     else:                                                                   #Solicitud web
         
         consulta=parcear(data)
