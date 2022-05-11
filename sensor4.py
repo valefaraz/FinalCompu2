@@ -3,11 +3,9 @@ import time
 from datetime import datetime
 import random
 
-
 HOST = '127.0.0.1'  # The server's hostname or IP address
 PORT = 8000        # The port used by the server
 count=0
-
 
 while True:
     clave ='sensor'
@@ -22,5 +20,3 @@ while True:
         s.send(datos.encode())
         time.sleep(86400)
         s.close()
-        count = count+1
-        print(count)

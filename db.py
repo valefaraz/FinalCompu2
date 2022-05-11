@@ -1,4 +1,3 @@
-from multiprocessing import connection
 import pymysql
 import json
 
@@ -49,7 +48,9 @@ def select_lux():
     connection = conexion()
     with connection:
         with connection.cursor() as cursor:
-            sql= 'SELECT s.id,s.tipo,mediciones.valor,mediciones.fecha FROM mediciones join sensores as s on mediciones.id_sensor=s.id where id_sensor=4 and mediciones.fecha <= NOW() AND mediciones.fecha >= date_add(NOW(), INTERVAL -7 DAY);'            
+            #sql= 'SELECT s.id,s.tipo,mediciones.valor,mediciones.fecha FROM mediciones join sensores as s on mediciones.id_sensor=s.id where id_sensor=4 and mediciones.fecha <= NOW() AND mediciones.fecha >= date_add(NOW(), INTERVAL -7 DAY);'            
+            sql= 'SELECT s.id,s.tipo,mediciones.valor,mediciones.fecha FROM mediciones join sensores as s on mediciones.id_sensor=s.id where id_sensor=4 ORDER BY mediciones.id desc LIMIT 7;'            
+            
             cursor.execute(sql)
             select = cursor.fetchall()
     return select
@@ -58,7 +59,7 @@ def select_ph():
     connection = conexion()
     with connection:
         with connection.cursor() as cursor:
-            sql= 'SELECT s.id,s.tipo,mediciones.valor,mediciones.fecha FROM mediciones join sensores as s on mediciones.id_sensor=s.id where id_sensor=3 and mediciones.fecha <= NOW() AND mediciones.fecha >= date_add(NOW(), INTERVAL -7 DAY);'            
+            sql= 'SELECT s.id,s.tipo,mediciones.valor,mediciones.fecha FROM mediciones join sensores as s on mediciones.id_sensor=s.id where id_sensor=3 ORDER BY mediciones.id desc LIMIT 7;'            
             cursor.execute(sql)
             select = cursor.fetchall()
     return select

@@ -1,16 +1,11 @@
-from cmath import phase
-from socket import socket
-import socketserver
 import os
 import asyncio
 import argparse
-import sys
-from urllib import request
-
-from numpy import printoptions
+from time import time
 import db
 from string import Template
 import tasks_celery
+import json
 
 
 def parcear(dato):
@@ -36,41 +31,19 @@ async def handle(reader, writer):
         #(2, 'Humedad', 25.0, datetime.datetime(2022, 4, 8, 12, 53, 28)), 
         #(3, 'PH', 13.0, datetime.datetime(2022, 4, 8, 12, 53, 35)), 
         #(4, 'Luminosidad', 1.0, datetime.datetime(2022, 4, 8, 12, 54, 31))]
-        
-        temperatura=[15,35] #rango permitido de temperatura
-        humedad=[30,70]     #rango permitido de humedad
-        ph=[5,6.5]          #rango permitido de ph
-        alerta=""
-        
-        if (ult_mediciones[1]) == "Temperatura":
-            if float(ult_mediciones[2]) < temperatura[0]:
-                alerta = "\nMedicion de" +str(ult_mediciones[1])+" por DEBAJO del rango aceptable: "+str(ult_mediciones[2])
-                tasks_celery.enviar_correo.delay(alerta)
-            elif float(ult_mediciones[2]) > temperatura[1]:
-                alerta= "\nMedicion de"+str(ult_mediciones[1])+" por ARRIBA del rango aceptable: "+str(ult_mediciones[2])
-                tasks_celery.enviar_correo.delay(alerta)
-            else:
-                alerta = "\nTemperatura OK"
-        
-        elif (ult_mediciones[1]) == "Humedad":
-            if float(ult_mediciones[2]) < humedad[0]:
-                alerta = "\nMedicion de " +str(ult_mediciones[1])+" por DEBAJO del rango aceptable: "+str(ult_mediciones[2])
-                tasks_celery.enviar_correo.delay(alerta)
-            elif float(ult_mediciones[2]) > humedad[1]:
-                alerta = "\nMedicion de "+str(ult_mediciones[1])+" por ARRIBA del rango aceptable: "+str(ult_mediciones[2])
-                tasks_celery.enviar_correo.delay(alerta)
-            else:
-                alerta = "\nHumedad OK"
-        
-        elif (ult_mediciones[1]) == "PH":
-            if float(ult_mediciones[2]) < ph[0]:
-                alerta = "\nMedicion de" +str(ult_mediciones[1])+" por DEBAJO del rango aceptable: "+str(ult_mediciones[2])
-                tasks_celery.enviar_correo.delay(alerta)
-            elif float(ult_mediciones[2]) > ph[1]:
-                alerta = "\nMedicion de "+str(ult_mediciones[1])+" por ARRIBA del rango aceptable: "+str(ult_mediciones[2])
-                tasks_celery.enviar_correo.delay(alerta)
-            else:
-                alerta="\nPH OK"
+        #temperatura=[15,35] #rango permitido de temperatura
+        #humedad=[30,70]     #rango permitido de humedad
+        #ph=[5,6.5]          #rango permitido de ph
+        with open(args.config, "r") as j:
+            config =json.load(j)
+            email_address = config["email_address"]
+            email_password = config["email_password"]
+            email_receiver = config["email_receiver"]
+            temperatura=config["temperatura"]
+            humedad=config["humedad"]
+            ph=config["ph"]
+
+        alerta=tasks_celery.enviar_correo(ult_mediciones,temperatura,humedad,ph,email_address,email_password,email_receiver)
         print(alerta)
         
     else:                                                                   #Solicitud web
@@ -85,8 +58,11 @@ async def handle(reader, writer):
 
                 ult_mediciones = db.select_ultimos_valores(cantidad_sensores)
                 #print(ult_mediciones)
+                
                 D={}
-
+                with open(args.config, "r") as j:
+                    config =json.load(j)
+                    D["time_reload"]=config["time_reload"]
                 ultimos_lux= db.select_lux()
                 ultimos_ph=db.select_ph()
                 ultimos_humedad = db.select_humedad()
@@ -99,14 +75,12 @@ async def handle(reader, writer):
                     D["fecha_ph"+str(x)]=ultimos_ph[x][3].date().day
                 for x in range(len(ultimos_humedad)):
                     D["medicion_h"+str(x)]=ultimos_humedad[x][2]
-                    D["fecha_h"+str(x)]=str(ultimos_humedad[x][3].hour)  #.hour)+':'+str(ultimos_humedad[x][3].minute))
+                    D["fecha_h"+str(x)]=str(ultimos_humedad[x][3].hour)
                 for num in range(cantidad_sensores):
                     D['sensor'+str(num+1)]= ult_mediciones[num][0]
                     D['tipo'+str(num+1)]= ult_mediciones[num][1]
                     D['medicion'+str(num+1)]= ult_mediciones[num][2]
                     D['fecha'+str(num+1)]= ult_mediciones[num][3]
-                #print(D)
-                #D["graficos"]="holaaaaaa"
                 v_web= src.substitute(D)                                            
                 path = os.getcwd() + '/filein.html'
                 fd = open(path,'w')
@@ -138,17 +112,15 @@ async def handle(reader, writer):
             header = bytearray("HTTP/1.1 " + respuesta + "\r\nContent-type:" + 'text/html' 
                         +"\r\nContent-length:" + str(len(body)) + "\r\n\r\n",'utf8')
 
-
         writer.write(header)                                                                        #Respondemos con la cabecera
         writer.write(body)                                                                          #Respondemos con el body
         writer.close()
 
-
-async def main():
+async def main(ipv4,port,ipv6):
     server = await asyncio.start_server(
                     handle,
-                    ['127.0.0.1', '::1'],
-                    8000)
+                    [ipv4, ipv6],
+                    port)
 
     addr = server.sockets[0].getsockname()
     print(f'Serving on {addr}')
@@ -156,7 +128,26 @@ async def main():
     async with server:
         await server.serve_forever()
 
-
 if __name__ == "__main__":
 
-    asyncio.run(main())
+    parser = argparse.ArgumentParser(usage="./server.py [-h] -p PORT -c /config.json")
+    parser.add_argument("-c", "--config", type=str, default=os.getcwd()+"/config.json", help="/home/../..")
+    parser.add_argument("-p", "--port", type=int, default=False, help="Puerto")
+    args = parser.parse_args()
+
+    with open(args.config, "r") as j:
+        print(args.config)
+        config =json.load(j)
+    if args.port != False:        
+        port=args.port    
+    else:
+        port=config["port_sv"]
+    
+    ipv4=config["ip4_sv"]
+    ipv6=config["ip6_sv"]
+
+    
+    if port > 65535 or port < 1023 :
+        print("No tiene permisos para ocupar este puerto o NO existe-->default puerto 5000")
+        port=8000
+    asyncio.run(main(ipv4,port,ipv6))

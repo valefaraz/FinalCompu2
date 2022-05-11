@@ -5,20 +5,62 @@ import smtplib, ssl
 from datetime import datetime
 import json
 
+from sqlalchemy import false
+
 app = Celery('tasks', broker='redis://localhost', backend='redis://localhost:6379')
 
 @app.task
-def enviar_correo(alerta):
+def enviar_correo(ult_mediciones,temperatura,humedad,ph,email_address,email_password,email_receiver):
+  enviar=False
+  if (ult_mediciones[1]) == "Temperatura":
+    if float(ult_mediciones[2]) < temperatura[0]:
+        alerta = "\nMedicion de" +str(ult_mediciones[1])+" por DEBAJO del rango aceptable: "+str(ult_mediciones[2])
+        #tasks_celery.enviar_correo.delay(alerta)
+        enviar=True
+    elif float(ult_mediciones[2]) > temperatura[1]:
+        alerta= "\nMedicion de"+str(ult_mediciones[1])+" por ARRIBA del rango aceptable: "+str(ult_mediciones[2])
+        #tasks_celery.enviar_correo.delay(alerta)
+        enviar=True
+    else:
+        alerta = "\nTemperatura OK"
+        
+  elif (ult_mediciones[1]) == "Humedad":
+      if float(ult_mediciones[2]) < humedad[0]:
+          alerta = "\nMedicion de " +str(ult_mediciones[1])+" por DEBAJO del rango aceptable: "+str(ult_mediciones[2])
+          #tasks_celery.enviar_correo.delay(alerta)
+          enviar=True
+      elif float(ult_mediciones[2]) > humedad[1]:
+          alerta = "\nMedicion de "+str(ult_mediciones[1])+" por ARRIBA del rango aceptable: "+str(ult_mediciones[2])
+          #tasks_celery.enviar_correo.delay(alerta)
+          enviar=True
+      else:
+          alerta = "\nHumedad OK"
+        
+  elif (ult_mediciones[1]) == "PH":
+      if float(ult_mediciones[2]) < ph[0]:
+          alerta = "\nMedicion de" +str(ult_mediciones[1])+" por DEBAJO del rango aceptable: "+str(ult_mediciones[2])
+          #tasks_celery.enviar_correo.delay(alerta)
+          enviar=True
+      elif float(ult_mediciones[2]) > ph[1]:
+          alerta = "\nMedicion de "+str(ult_mediciones[1])+" por ARRIBA del rango aceptable: "+str(ult_mediciones[2])
+          #tasks_celery.enviar_correo.delay(alerta)
+          enviar=True
+      else:
+          alerta="\nPH OK"
+
+
+  if enviar:
+
     smtp_address = 'smtp.gmail.com'
     smtp_port = 465
-    with open("config.json", "r") as j:
-      data =json.load(j)
+    #with open("config.json", "r") as j:
+    #  data =json.load(j)
 
-    email_address = data["email_address"]
-    email_password = data["email_password"]
+    #email_address = data["email_address"]
+    #email_password = data["email_password"]
 
     # destinatario y mensaje
-    email_receiver = data["email_receiver"]
+    #email_receiver = data["email_receiver"]
     fecha= datetime.today()
     msj="""
     Fecha: %s 
@@ -33,6 +75,7 @@ def enviar_correo(alerta):
       server.login(email_address, email_password)
       # envio del mail
       server.sendmail(email_address, email_receiver, msj)
+  return alerta
 
 if __name__ == "__main__":
     app.start()

@@ -69,10 +69,10 @@
         const myChartLux = new Chart(ctxLux, {
             type: 'line',
             data: {
-                labels: [$fecha_lux0, $fecha_lux1, $fecha_lux2, $fecha_lux3, $fecha_lux4, $fecha_lux5, $fecha_lux6],
+                labels: [$fecha_lux6, $fecha_lux5, $fecha_lux4, $fecha_lux3, $fecha_lux2, $fecha_lux1, $fecha_lux0],
                 datasets: [{
                     label: 'Nivel de iluminación ultimos 7 dias',
-                    data: [$medicion_lux0, $medicion_lux1, $medicion_lux2, $medicion_lux3, $medicion_lux4, $medicion_lux5, $medicion_lux6],
+                    data: [$medicion_lux6, $medicion_lux5, $medicion_lux4, $medicion_lux3, $medicion_lux2, $medicion_lux1, $medicion_lux0],
                     backgroundColor: [
                         'rgba(255, 255, 0, 1)',
                     ],
@@ -96,10 +96,10 @@
         const myChartPH = new Chart(ctxPH, {
             type: 'line',
             data: {
-                labels: [$fecha_ph0, $fecha_ph1, $fecha_ph2, $fecha_ph3, $fecha_ph4, $fecha_ph5, $fecha_ph6],
+                labels: [$fecha_ph6, $fecha_ph5, $fecha_ph4, $fecha_ph3, $fecha_ph2, $fecha_ph1, $fecha_ph0],
                 datasets: [{
                     label: 'Nivel de PH ultimos 7 dias',
-                    data: [$medicion_ph0, $medicion_ph1, $medicion_ph2, $medicion_ph3, $medicion_ph4, $medicion_ph5, $medicion_ph6],
+                    data: [$medicion_ph6, $medicion_ph5, $medicion_ph4, $medicion_ph3, $medicion_ph2, $medicion_ph1, $medicion_ph0],
                     backgroundColor: [
                         'rgba(255, 20, 0, 1)',
                     ],
@@ -125,18 +125,18 @@
     const myChartH = new Chart(ctxH, {
         type: 'line',
         data: {
-            labels: [$fecha_h0, $fecha_h1, $fecha_h2, $fecha_h3, $fecha_h4, $fecha_h5, $fecha_h6,
-            $fecha_h7, $fecha_h8, $fecha_h9, $fecha_h10, $fecha_h11, $fecha_h12, $fecha_h13,
-            $fecha_h14, $fecha_h15, $fecha_h16, $fecha_h17, $fecha_h18, $fecha_h19, $fecha_h20,
-            $fecha_h21, $fecha_h21, $fecha_h23, $fecha_h24, $fecha_h25, $fecha_h26, $fecha_h27        
+            labels: [$fecha_h27, $fecha_h26, $fecha_h25, $fecha_h24, $fecha_h23, $fecha_h22, $fecha_h21,
+            $fecha_h20, $fecha_h19, $fecha_h18, $fecha_h17, $fecha_h16, $fecha_h15, $fecha_h14,
+            $fecha_h13, $fecha_h12, $fecha_h11, $fecha_h10, $fecha_h9, $fecha_h8, $fecha_h7,
+            $fecha_h6, $fecha_h5, $fecha_h4, $fecha_h3, $fecha_h2, $fecha_h1, $fecha_h0        
         
         ],
             datasets: [{
                 label: 'Humedad',
-                data:[$medicion_h0, $medicion_h1, $medicion_h2, $medicion_h3, $medicion_h4, $medicion_h5, $medicion_h6,
-            $medicion_h7, $medicion_h8, $medicion_h9, $medicion_h10, $medicion_h11, $medicion_h12, $medicion_h13,
-            $medicion_h14, $medicion_h15, $medicion_h16, $medicion_h17, $medicion_h18, $medicion_h19, $medicion_h20,
-            $medicion_h21, $medicion_h21, $medicion_h23, $medicion_h24, $medicion_h25, $medicion_h26, $medicion_h27        
+                data:[$medicion_h27, $medicion_h26, $medicion_h25, $medicion_h24, $medicion_h23, $medicion_h22, $medicion_h21,
+            $medicion_h20, $medicion_h19, $medicion_h18, $medicion_h17, $medicion_h16, $medicion_h15, $medicion_h14,
+            $medicion_h13, $medicion_h12, $medicion_h11, $medicion_h10, $medicion_h9, $medicion_h8, $medicion_h7,
+            $medicion_h6, $medicion_h5, $medicion_h4, $medicion_h3, $medicion_h2, $medicion_h1, $medicion_h0        
         
         ], 
                 backgroundColor: [
@@ -164,7 +164,7 @@
     <script> 
     setTimeout(function(){
     window.location.reload(1);
-    }, 50000);
+    }, $time_reload);
     </script>
 
 
