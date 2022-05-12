@@ -12,5 +12,3 @@ Dependiendo el tipo de cultivo que se está controlando, se conocen los rangos a
 Los parametros de la configuracion de la db y el correo se leen desde un archivo externo.
 
 La simulacion de los sensores se realiza con 4 script de python para facilitar las pruebas pero se podria implementar sin ningun problema con arduino o raspberry y utilizar sensores reales.
-
-Se realiará despliegue en contenedores Docker.

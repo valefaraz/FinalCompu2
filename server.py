@@ -2,10 +2,15 @@ import os
 import asyncio
 import argparse
 from time import time
+
+from lockfile import Error
+from sqlalchemy import true
 import db
 from string import Template
 import tasks_celery
 import json
+from simplecrypt import decrypt
+
 
 
 def parcear(dato):
@@ -20,11 +25,23 @@ async def handle(reader, writer):
     
     data = await reader.read(100000)                                #Datos que recibe el servidor
     #print(data)
+    key=db.select_key()
+    try:
+        data_decrypt=decrypt(key,data)
+        #print(data_decrypt)
+        data_decrypt=data_decrypt.decode()
+    except:
+        decrypt_flag=False
+    else:
+        decrypt_flag=True
+
+    #print(data_decrypt)
     
-    if  data.decode()[0:6] == 'sensor':                             #Solicitud del sensor 
+    #decrypt=False
+    if  decrypt_flag==True and data_decrypt[0:6] == 'sensor':                             #Solicitud del sensor 
         print ('Dato recibido')
-        db.insert(data.decode())
-        id_sensor = data.decode()[9:10]
+        db.insert(data_decrypt)
+        id_sensor = data_decrypt[9:10]
         ult_mediciones=db.select_ultimo(id_sensor)
 
         #[(1, 'Temperatura', 12.96, datetime.datetime(2022, 4, 14, 20, 59, 56)), 
@@ -42,23 +59,23 @@ async def handle(reader, writer):
             temperatura=config["temperatura"]
             humedad=config["humedad"]
             ph=config["ph"]
-
-        alerta=tasks_celery.enviar_correo(ult_mediciones,temperatura,humedad,ph,email_address,email_password,email_receiver)
-        print(alerta)
+        try:
+            alerta=tasks_celery.enviar_correo(ult_mediciones,temperatura,humedad,ph,email_address,email_password,email_receiver)
+            print(alerta)
+        except:
+            Error
         
     else:                                                                   #Solicitud web
-        
         consulta=parcear(data)
         print(consulta)
+
         cantidad_sensores=4
         if consulta[0] == "GET":                                                                #Respuesta a  metodo GET
             if os.path.isfile(consulta[1].replace('/','')) == True or consulta[1]== '/':        #Respuesta si existe el archivo o /
                 filein= open(os.getcwd() + '/index.html')
                 src=Template(filein.read())
-
                 ult_mediciones = db.select_ultimos_valores(cantidad_sensores)
                 #print(ult_mediciones)
-                
                 D={}
                 with open(args.config, "r") as j:
                     config =json.load(j)
@@ -66,7 +83,6 @@ async def handle(reader, writer):
                 ultimos_lux= db.select_lux()
                 ultimos_ph=db.select_ph()
                 ultimos_humedad = db.select_humedad()
-
                 for x in range(len(ultimos_lux)):
                     D["medicion_lux"+str(x)]=ultimos_lux[x][2]
                     D["fecha_lux"+str(x)]=ultimos_lux[x][3].date().day
@@ -92,7 +108,6 @@ async def handle(reader, writer):
                 respuesta= '200 OK'
                 header = bytearray("HTTP/1.1 " + respuesta + "\r\nContent-type:" + 'text/html' 
                             +"\r\nContent-length:" + str(len(body)) + "\r\n\r\n",'utf8')
-
             elif os.path.isfile(consulta[1].replace('/','')) == False:                          #Respuesta si no existe el archivo
                 path = os.getcwd() + '/error404.html'
                 fd2=os.open(path, os.O_RDONLY)
@@ -102,7 +117,6 @@ async def handle(reader, writer):
                 header = bytearray("HTTP/1.1 " + respuesta + "\r\nContent-type:" + 'text/html' 
                             +"\r\nContent-length:" + str(len(body)) + "\r\n\r\n",'utf8')
                 
-                
         else:                                                                                   #Respuesta si el metodo no esta permitido
             path = os.getcwd() + '/error405.html'
             fd2=os.open(path, os.O_RDONLY)
@@ -111,7 +125,9 @@ async def handle(reader, writer):
             respuesta= '405 Method Not Allowed'
             header = bytearray("HTTP/1.1 " + respuesta + "\r\nContent-type:" + 'text/html' 
                         +"\r\nContent-length:" + str(len(body)) + "\r\n\r\n",'utf8')
-
+        #writer.close()
+        #rechazar=True
+     
         writer.write(header)                                                                        #Respondemos con la cabecera
         writer.write(body)                                                                          #Respondemos con el body
         writer.close()

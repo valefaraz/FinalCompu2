@@ -53,14 +53,6 @@ def enviar_correo(ult_mediciones,temperatura,humedad,ph,email_address,email_pass
 
     smtp_address = 'smtp.gmail.com'
     smtp_port = 465
-    #with open("config.json", "r") as j:
-    #  data =json.load(j)
-
-    #email_address = data["email_address"]
-    #email_password = data["email_password"]
-
-    # destinatario y mensaje
-    #email_receiver = data["email_receiver"]
     fecha= datetime.today()
     msj="""
     Fecha: %s 

@@ -10,6 +10,25 @@ def conexion():
                         database=config["name"])
     return connection
 
+def select_key():
+    connection = conexion()
+    with connection:
+        with connection.cursor() as cursor:
+            sql = "SELECT value FROM passkey order by id desc limit 1"
+            cursor.execute(sql)
+            connection.commit()
+            select = cursor.fetchone()
+    return select[0]
+
+
+def save_key(key):
+    connection = conexion()
+    with connection:
+        with connection.cursor() as cursor:
+            sql = "INSERT INTO passkey (value) VALUES (%s)"
+            cursor.execute(sql, (key))
+            connection.commit()
+
 def insert(data):
     connection = conexion()
     lista=data.split(sep=' , ')
