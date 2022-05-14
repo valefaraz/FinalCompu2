@@ -1,5 +1,3 @@
-# Celery service example: task to multiply two numbers
-
 from celery import Celery
 import smtplib, ssl
 from datetime import datetime
@@ -14,11 +12,11 @@ def enviar_correo(ult_mediciones,temperatura,humedad,ph,email_address,email_pass
   enviar=False
   if (ult_mediciones[1]) == "Temperatura":
     if float(ult_mediciones[2]) < temperatura[0]:
-        alerta = "\nMedicion de" +str(ult_mediciones[1])+" por DEBAJO del rango aceptable: "+str(ult_mediciones[2])
+        alerta = "\nMedicion de " +str(ult_mediciones[1])+" por DEBAJO del rango aceptable: "+str(ult_mediciones[2])
         #tasks_celery.enviar_correo.delay(alerta)
         enviar=True
     elif float(ult_mediciones[2]) > temperatura[1]:
-        alerta= "\nMedicion de"+str(ult_mediciones[1])+" por ARRIBA del rango aceptable: "+str(ult_mediciones[2])
+        alerta= "\nMedicion de "+str(ult_mediciones[1])+" por ARRIBA del rango aceptable: "+str(ult_mediciones[2])
         #tasks_celery.enviar_correo.delay(alerta)
         enviar=True
     else:
@@ -38,7 +36,7 @@ def enviar_correo(ult_mediciones,temperatura,humedad,ph,email_address,email_pass
         
   elif (ult_mediciones[1]) == "PH":
       if float(ult_mediciones[2]) < ph[0]:
-          alerta = "\nMedicion de" +str(ult_mediciones[1])+" por DEBAJO del rango aceptable: "+str(ult_mediciones[2])
+          alerta = "\nMedicion de " +str(ult_mediciones[1])+" por DEBAJO del rango aceptable: "+str(ult_mediciones[2])
           #tasks_celery.enviar_correo.delay(alerta)
           enviar=True
       elif float(ult_mediciones[2]) > ph[1]:

@@ -1,14 +1,28 @@
 import pymysql
 import json
 
+
 def conexion():
     with open("config.json", "r") as j:
-        config =json.load(j)
+        config = json.load(j)
     connection = pymysql.connect(host=config["host"],
-                        user=config["user"],
-                        passwd=config["pass"],
-                        database=config["name"])
+                                 user=config["user"],
+                                 passwd=config["pass"],
+                                 database=config["name"])
     return connection
+
+
+def count_sensores():
+    connection = conexion()
+    with connection:
+        with connection.cursor() as cursor:
+            sql="select count(*) from sensores;"
+            #sql = "SELECT value FROM passkey order by id desc limit 1"
+            cursor.execute(sql)
+            select = cursor.fetchone()
+    return int(select[0])
+
+
 
 def select_key():
     connection = conexion()
@@ -16,7 +30,6 @@ def select_key():
         with connection.cursor() as cursor:
             sql = "SELECT value FROM passkey order by id desc limit 1"
             cursor.execute(sql)
-            connection.commit()
             select = cursor.fetchone()
     return select[0]
 
@@ -29,65 +42,71 @@ def save_key(key):
             cursor.execute(sql, (key))
             connection.commit()
 
+
 def insert(data):
     connection = conexion()
-    lista=data.split(sep=' , ')
-    id_sensor=lista[1]
-    valor=lista[2]
-    fecha=lista[3]
+    lista = data.split(sep=' , ')
+    id_sensor = lista[1]
+    valor = lista[2]
+    fecha = lista[3]
     with connection:
         with connection.cursor() as cursor:
             sql = "INSERT INTO mediciones (id_sensor, valor, fecha) VALUES (%s, %s,%s)"
-            cursor.execute(sql, (id_sensor,valor,fecha))
+            cursor.execute(sql, (id_sensor, valor, fecha))
             connection.commit()
+
 
 def select_ultimos_valores(cantidad_sensores):
     connection = conexion()
-    result=[]
+    result = []
     with connection:
         with connection.cursor() as cursor:
             for i in range(cantidad_sensores):
-                sql= 'SELECT s.id,s.tipo,mediciones.valor,mediciones.fecha FROM mediciones join sensores as s on mediciones.id_sensor=s.id where id_sensor=%s order by mediciones.id desc limit 1;'
+                sql = 'SELECT s.id,s.tipo,mediciones.valor,mediciones.fecha FROM mediciones join sensores as s on mediciones.id_sensor=s.id where id_sensor=%s order by mediciones.id desc limit 1;'
                 #sql = "SELECT mediciones.valor,s.tipo FROM mediciones join sensores as s on mediciones.id_sensor=s.id where id_sensor=%s order by mediciones.id desc limit 1;"
-                cursor.execute(sql,(str(i+1),))
+                cursor.execute(sql, (str(i+1),))
                 select = cursor.fetchone()
                 result.append(select)
     return result
+
 
 def select_ultimo(id):
     connection = conexion()
     with connection:
         with connection.cursor() as cursor:
-            sql= 'SELECT s.id,s.tipo,mediciones.valor,mediciones.fecha FROM mediciones join sensores as s on mediciones.id_sensor=s.id where id_sensor=%s order by mediciones.id desc limit 1;'
-            cursor.execute(sql,(str(id),))
+            sql = 'SELECT s.id,s.tipo,mediciones.valor,mediciones.fecha FROM mediciones join sensores as s on mediciones.id_sensor=s.id where id_sensor=%s order by mediciones.id desc limit 1;'
+            cursor.execute(sql, (str(id),))
             select = cursor.fetchone()
     return select
+
 
 def select_lux():
     connection = conexion()
     with connection:
         with connection.cursor() as cursor:
-            #sql= 'SELECT s.id,s.tipo,mediciones.valor,mediciones.fecha FROM mediciones join sensores as s on mediciones.id_sensor=s.id where id_sensor=4 and mediciones.fecha <= NOW() AND mediciones.fecha >= date_add(NOW(), INTERVAL -7 DAY);'            
-            sql= 'SELECT s.id,s.tipo,mediciones.valor,mediciones.fecha FROM mediciones join sensores as s on mediciones.id_sensor=s.id where id_sensor=4 ORDER BY mediciones.id desc LIMIT 7;'            
-            
+            #sql= 'SELECT s.id,s.tipo,mediciones.valor,mediciones.fecha FROM mediciones join sensores as s on mediciones.id_sensor=s.id where id_sensor=4 and mediciones.fecha <= NOW() AND mediciones.fecha >= date_add(NOW(), INTERVAL -7 DAY);'
+            sql = 'SELECT s.id,s.tipo,mediciones.valor,mediciones.fecha FROM mediciones join sensores as s on mediciones.id_sensor=s.id where id_sensor=4 ORDER BY mediciones.id desc LIMIT 7;'
+
             cursor.execute(sql)
             select = cursor.fetchall()
     return select
+
 
 def select_ph():
     connection = conexion()
     with connection:
         with connection.cursor() as cursor:
-            sql= 'SELECT s.id,s.tipo,mediciones.valor,mediciones.fecha FROM mediciones join sensores as s on mediciones.id_sensor=s.id where id_sensor=3 ORDER BY mediciones.id desc LIMIT 7;'            
+            sql = 'SELECT s.id,s.tipo,mediciones.valor,mediciones.fecha FROM mediciones join sensores as s on mediciones.id_sensor=s.id where id_sensor=3 ORDER BY mediciones.id desc LIMIT 7;'
             cursor.execute(sql)
             select = cursor.fetchall()
     return select
+
 
 def select_humedad():
     connection = conexion()
     with connection:
         with connection.cursor() as cursor:
-            sql= 'SELECT s.id,s.tipo,mediciones.valor,mediciones.fecha FROM mediciones join sensores as s on mediciones.id_sensor=s.id where id_sensor=2 order by mediciones.id desc limit 100;'            
+            sql = 'SELECT s.id,s.tipo,mediciones.valor,mediciones.fecha FROM mediciones join sensores as s on mediciones.id_sensor=s.id where id_sensor=2 order by mediciones.id desc limit 100;'
             cursor.execute(sql)
             select = cursor.fetchall()
     return select
