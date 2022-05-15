@@ -36,7 +36,7 @@ async def handle(reader, writer):                   #corutina que maneja la cone
 
     # Solicitud del sensor
     if decrypt_flag == True and data_decrypt[0:6] == 'sensor':
-        print('Dato recibido')
+        print('Dato del sensor recibido')
         db.insert(data_decrypt)
         id_sensor = data_decrypt[9:10]
         ult_mediciones = db.select_ultimo(id_sensor)
@@ -57,9 +57,8 @@ async def handle(reader, writer):                   #corutina que maneja la cone
             humedad = config["humedad"]
             ph = config["ph"]
         try:
-            alerta = tasks_celery.enviar_correo(
+            alerta = tasks_celery.enviar_correo.delay(
                 ult_mediciones, temperatura, humedad, ph, email_address, email_password, email_receiver)
-            print(alerta)
         except:
             print("Error Task Celery")
 
