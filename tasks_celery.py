@@ -3,13 +3,12 @@ import smtplib, ssl
 from datetime import datetime
 import json
 
-from sqlalchemy import false
-
 app = Celery('tasks', broker='redis://localhost', backend='redis://localhost:6379')
 
 @app.task
 def enviar_correo(ult_mediciones,temperatura,humedad,ph,email_address,email_password,email_receiver):
   enviar=False
+  alerta=''
   if (ult_mediciones[1]) == "Temperatura":
     if float(ult_mediciones[2]) < temperatura[0]:
         alerta = "\nMedicion de " +str(ult_mediciones[1])+" por DEBAJO del rango aceptable: "+str(ult_mediciones[2])
@@ -67,6 +66,6 @@ def enviar_correo(ult_mediciones,temperatura,humedad,ph,email_address,email_pass
       server.sendmail(email_address, email_receiver, msj)
   return alerta
 
-if __name__ == "__main__":
-    app.start()
+#if __name__ == "__main__":
+#    app.start()
 

@@ -20,9 +20,9 @@ def parcear(dato):
     return(pedido)
 
 
-async def handle(reader, writer):
+async def handle(reader, writer):                   #corutina que maneja la conexion del cliente
 
-    data = await reader.read(100000)  # Datos que recibe el servidor
+    data = await reader.read(100000)                # Datos que recibe el servidor, si no hay datos no me quedo esperando
     #print(data)
     key = db.select_key()
     try:
@@ -61,10 +61,13 @@ async def handle(reader, writer):
                 ult_mediciones, temperatura, humedad, ph, email_address, email_password, email_receiver)
             print(alerta)
         except:
-            Error
+            print("Error Task Celery")
 
     else:  # Solicitud web
-        consulta = parcear(data)
+        try:
+            consulta = parcear(data)
+        except:
+            consulta=['']
         print(consulta)
 
         cantidad_sensores = db.count_sensores()
@@ -131,21 +134,15 @@ async def handle(reader, writer):
             header = bytearray("HTTP/1.1 " + respuesta + "\r\nContent-type:" + 'text/html'
                                + "\r\nContent-length:" + str(len(body)) + "\r\n\r\n", 'utf8')
 
-        writer.write(header)  # Respondemos con la cabecera
-        writer.write(body)  # Respondemos con el body
+        writer.write(header)        #Enviamos la cabecera
+        writer.write(body)          #Enviamos el body
+        await writer.drain()        #Esperamos que todo se haya enviado
         writer.close()
 
 
-async def main(ipv4, port, ipv6):
-    #ssl_context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
-    #ssl_context.check_hostname = True
-    #ssl_context.load_cert_chain('/home/valentin/Escritorio/compu2/final/ssl/certificado.pem', '/home/valentin/Escritorio/compu2/final/ssl/clave.pem')
-    #server = await asyncio.start_server(
-    #                handle,
-    #                [ipv4, ipv6],
-    #                port,ssl=ssl_context)
+async def main(ipv4, port, ipv6):               #corutina principal
 
-    server = await asyncio.start_server(
+    server = await asyncio.start_server(                #levanto un servidor asincronico
         handle,
         [ipv4, ipv6],
         port)
@@ -153,7 +150,7 @@ async def main(ipv4, port, ipv6):
     addr = server.sockets[0].getsockname()
     print(f'Serving on {addr}')
 
-    async with server:
+    async with server:                                  #Atiende a un cliente y vuelve a escuchar nuevas conexiones
         await server.serve_forever()
 
 if __name__ == "__main__":

@@ -27,5 +27,6 @@ while True:
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.connect((HOST, PORT))
         s.send(datos)
+        print(datos)
         time.sleep(86400)
         s.close()
