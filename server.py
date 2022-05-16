@@ -1,15 +1,11 @@
 import os
 import asyncio
 import argparse
-from time import time
-from lockfile import Error
-from sqlalchemy import false, true
 import db
 from string import Template
 import tasks_celery
 import json
 from simplecrypt import decrypt
-import ssl
 
 def parcear(dato):
     try:
