@@ -1,0 +1,15 @@
+version: '2.4'
+services:
+  database:
+    container_name: mysql
+    image: mysql
+    volumes:
+      - "./mysql-data:/var/lib/mysql"
+    ports:
+      - 3306:3306
+    hostname: localhost
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: scc
+      MYSQL_USER: valentin
+      MYSQL_PASSWORD: valentin

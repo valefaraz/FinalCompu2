@@ -1,0 +1,27 @@
+
+{
+    "name": "scc",
+    "user": "valentin",
+    "pass": "valentin",
+    "host":"localhost",
+    "port":3306,
+    
+    "email_receiver": "",
+    "email_address": "",
+    "email_password": "",
+
+    "ip4_sv": "127.0.0.1",
+    "ip6_sv": "::1",
+    "port_sv":8000,
+    
+    "temperatura":[15,35], 
+    "humedad":[30,70],     
+    "ph":[5,6.5],
+
+    "time_reload":50000,
+
+    "smtp_address":"smtp.gmail.com",
+    "smtp_port": 465
+
+
+}

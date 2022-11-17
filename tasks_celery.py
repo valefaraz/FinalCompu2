@@ -6,7 +6,7 @@ import json
 app = Celery('tasks', broker='redis://localhost', backend='redis://localhost:6379')
 
 @app.task
-def enviar_correo(ult_mediciones,temperatura,humedad,ph,email_address,email_password,email_receiver):
+def enviar_correo(ult_mediciones,temperatura,humedad,ph,email_address,email_password,email_receiver,smtp_address,smtp_port):
   enviar=False
   alerta=''
   if (ult_mediciones[1]) == "Temperatura":
@@ -48,10 +48,11 @@ def enviar_correo(ult_mediciones,temperatura,humedad,ph,email_address,email_pass
 
   if enviar:
 
-    smtp_address = 'smtp.gmail.com'
-    smtp_port = 465
+    #smtp_address = 'smtp.gmail.com'
+    #smtp_port = 465
     fecha= datetime.today()
-    msj="""
+    msj="""Subject: Alerta de cultivo \n
+
     Fecha: %s 
     Alerta de Cultivo
     %s

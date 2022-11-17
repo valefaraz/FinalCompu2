@@ -52,13 +52,15 @@ async def handle(reader, writer):                   #corutina que maneja la cone
             temperatura = config["temperatura"]
             humedad = config["humedad"]
             ph = config["ph"]
+            smtp_address = config["smtp_address"]
+            smtp_port = config["smtp_port"]
         try:
             alerta = tasks_celery.enviar_correo.delay(
-                ult_mediciones, temperatura, humedad, ph, email_address, email_password, email_receiver)
+                ult_mediciones, temperatura, humedad, ph, email_address, email_password, email_receiver,smtp_address,smtp_port)
         except:
             print("Error Task Celery")
 
-    else:  # Solicitud web
+    else:  #Posible Solicitud web
         try:
             consulta = parcear(data)
         except:
@@ -72,12 +74,12 @@ async def handle(reader, writer):                   #corutina que maneja la cone
             if os.path.isfile(consulta[1].replace('/', '')) == True or consulta[1] == '/':
                 filein = open(os.getcwd() + '/index.html')
                 src = Template(filein.read())
-                ult_mediciones = db.select_ultimos_valores(cantidad_sensores)
                 # print(ult_mediciones)
                 D = {}
                 with open(args.config, "r") as j:
                     config = json.load(j)
                     D["time_reload"] = config["time_reload"]
+                ult_mediciones = db.select_ultimos_valores(cantidad_sensores)
                 ultimos_lux = db.select_lux()
                 ultimos_ph = db.select_ph()
                 ultimos_humedad = db.select_humedad()
@@ -99,17 +101,32 @@ async def handle(reader, writer):                   #corutina que maneja la cone
                     D['medicion'+str(num+1)] = ult_mediciones[num][2]
                     D['fecha'+str(num+1)] = ult_mediciones[num][3]
                 v_web = src.substitute(D)
-                path = os.getcwd() + '/filein.html'
-                fd = open(path, 'w')
-                fd.writelines(v_web)
-                fd.close()
+                
+                #print(v_web)
+                
+
+                #path = os.getcwd() + '/filein.html'
+                #fd = open(path, 'w')
+                #Reescribimos el index con los valores de las variables
+                #fd.writelines(v_web)
+                #fd.close()
                 #armamos la respuesta
-                fd2 = os.open(path, os.O_RDONLY)
-                body = os.read(fd2, os.stat(path).st_size)
-                os.close(fd2)
+                #fd2 = os.open(path, os.O_RDONLY)
+                #body = os.read(fd2, os.stat(path).st_size)
+                #print(os.stat(path).st_size)    #5438
+                #os.close(fd2)
+                #respuesta = '200 OK'
+                #header = bytearray("HTTP/1.1 " + respuesta + "\r\nContent-type:" + 'text/html'
+                #                   + "\r\nContent-length:" + str(len(body)) + "\r\n\r\n", 'utf8')
+                #size='5438'
+                
+                body= v_web.encode()
+                size= str(len(body))
                 respuesta = '200 OK'
                 header = bytearray("HTTP/1.1 " + respuesta + "\r\nContent-type:" + 'text/html'
-                                   + "\r\nContent-length:" + str(len(body)) + "\r\n\r\n", 'utf8')
+                                   + "\r\nContent-length:" + size + "\r\n\r\n", 'utf8')
+
+
             # Respuesta si no existe el archivo
             elif os.path.isfile(consulta[1].replace('/', '')) == False:
                 path = os.getcwd() + '/error404.html'
@@ -160,7 +177,7 @@ if __name__ == "__main__":
     with open(args.config, "r") as j:
         print(args.config)
         config = json.load(j)
-    if args.port != False:
+    if args.port != False:      #ingreso un puerto por linea de comandos
         port = args.port
     else:
         port = config["port_sv"]
